@@ -1,0 +1,28 @@
+{
+  "name": "frappe-ui-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --base=/assets/finsta/frontend/ && yarn copy-html-entry",
+    "preview": "vite preview",
+    "copy-html-entry": "cp ../finsta/public/frontend/index.html ../finsta/www/frontend.html"
+  },
+  "dependencies": {
+    "@inertiajs/core": "^1.2.0",
+    "@inertiajs/vue3": "^1.2.0",
+    "feather-icons": "^4.28.0",
+    "frappe-ui": "^0.1.54",
+    "vue": "^3.2.25",
+    "vue-material-design-icons": "^5.3.1",
+    "vue-router": "^4.0.12",
+    "vue3-carousel": "^0.4.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^2.0.0",
+    "autoprefixer": "^10.4.2",
+    "postcss": "^8.4.5",
+    "tailwindcss": "^3.0.15",
+    "vite": "^2.7.2"
+  }
+}

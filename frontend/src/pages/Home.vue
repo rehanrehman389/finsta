@@ -1,6 +1,6 @@
 <template>
   <MainLayout>
-    <div class="bg-green-500">HOME.VUE</div>
+    <div class="bg-red-500">HOME.VUE</div>
   </MainLayout>
 </template>
 

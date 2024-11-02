@@ -1,6 +1,6 @@
 ## Finsta
 
-Instagram with Frappe Backend and Vue
+Instagram Clone with Frappe Backend and Vue
 
 #### License
 

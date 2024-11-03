@@ -17,6 +17,6 @@ export default defineConfig({
     target: 'esnext',
   },
   optimizeDeps: {
-    include: ['frappe-ui > feather-icons', 'showdown', 'engine.io-client'],
+    include: ['vue3-carousel', 'frappe-ui > feather-icons', 'showdown', 'engine.io-client'],
   },
 })

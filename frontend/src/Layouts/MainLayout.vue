@@ -119,6 +119,8 @@
             </Link>
         </div>
     </div>
+
+    <CreatePostOverlay v-if="showCreatePost" @close="$event => showCreatePost = false"/>
 </template>
 
 <script setup>
@@ -134,7 +136,7 @@ import Plus from 'vue-material-design-icons/Plus.vue';
 import AccountOutline from 'vue-material-design-icons/AccountOutline.vue';
 
 import MenuItem from '../Components/MenuItem.vue';
-import Button from 'frappe-ui/src/components/Button.vue';
+import CreatePostOverlay from '../Components/CreatePostOverlay.vue';
 
 let showCreatePost = ref(false);
 </script>

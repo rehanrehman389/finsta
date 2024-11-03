@@ -9,7 +9,7 @@
 
     // const user = usePage().props.auth.user
 
-    const emit = defineEmits(['cloase'])
+    const emit = defineEmits(['close'])
 
     const form = reactive({
         text: null,

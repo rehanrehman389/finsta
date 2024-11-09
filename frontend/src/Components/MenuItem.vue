@@ -2,6 +2,7 @@
 
 import { toRefs } from 'vue';
 import { usePage } from '@inertiajs/vue3';
+    import { session } from '../data/session'
 
 const props = defineProps({ iconString: String })
 const { iconString } = toRefs(props)
@@ -45,7 +46,7 @@ import Menu from 'vue-material-design-icons/Menu.vue';
                 v-if="iconString === 'Profile'"
                 :class="{'mr-1': iconString === 'Profile'}"
                 class="rounded-full ml-[2px] w-[30px] cursor-pointer"
-                src="https://picsum.photos/id/8/300/320"
+                :src="session.userImage"
             >
             <component v-else :is="icon" fillColor="#000000" :size="36" />
             <span class="xl:block hidden text-black font-extrabold text-[18px] pl-2 mt-0.5">

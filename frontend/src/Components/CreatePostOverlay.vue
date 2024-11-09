@@ -10,6 +10,7 @@
     import ChevronDown from 'vue-material-design-icons/ChevronDown.vue';
 
     // const user = usePage().props.auth.user
+    import { session } from '../data/session'
 
     const emit = defineEmits(['close'])
 
@@ -148,8 +149,8 @@
                 <div id="TextAreaSection" class="max-w-[720px] w-full relative">
                     <div class="flex items-center justify-between p-3">
                         <div class="flex items-center">
-                            <img class="rounded-full w-[38px] h-[38px]" src="https://picsum.photos/id/50/300/320">
-                            <div class="ml-4 font-extrabold text-[15px]">Name Here</div>
+                            <img class="rounded-full w-[38px] h-[38px]" :src="session.userImage">
+                            <div class="ml-4 font-extrabold text-[15px]">{{ session.user }}</div>
                         </div>
                     </div>
 

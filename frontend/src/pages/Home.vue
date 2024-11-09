@@ -221,7 +221,7 @@
     @addComment="addComment($event)"
     @updateLike="updateLike($event)"
     @deleteSelected="deleteFunc($event)"
-    @closeOverlay="$event => openOverlay = false"
+    @closeOverlay="openOverlay = false"
   />
 </template>
 

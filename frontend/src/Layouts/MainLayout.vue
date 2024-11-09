@@ -90,7 +90,7 @@
                             <img class="rounded-full z-10 w-[37px] h-[37px]" :src="ruser.user_image" >
                             <div class="pl-4">
                                 <div class="text-black font-extrabold">{{ ruser.username }}</div>
-                                <div class="text-gray-500 font-extrabold text-sm">Suggested for you</div>                             
+                                <div class="text-gray-500 font-extrabold text-sm">{{ ruser.full_name }}</div>                             
                             </div>
                         </div>
                         <button class="text-blue-500 hover:text=gray-900 text-xs font-extrabold">

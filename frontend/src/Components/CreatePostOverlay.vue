@@ -56,7 +56,7 @@
 
             let post_doc = createListResource({
                 doctype: 'Post',
-                fields: ['file', 'user', 'text'],
+                fields: ['file', 'text'],
                 auto: true,
 
                 insert: {

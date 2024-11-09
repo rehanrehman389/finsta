@@ -36,6 +36,7 @@
       insert: {
         onSuccess(data) {
             console.log("Post created successfully:", data)
+            fetchPosts();
           },
         onError(error) {
           console.error("Error creating post:", error)
@@ -67,6 +68,16 @@
           doctype: 'Post',
           fields: ['file', 'text'],
           auto: true,
+
+          delete: {
+            onSuccess(data) {
+                console.log("Like created successfully:", data)
+                fetchPosts();
+              },
+            onError(error) {
+              console.error("Error creating post:", error)
+            }
+          }
     })
 
 
@@ -74,6 +85,16 @@
           doctype: 'Comment',
           fields: ['reference_doctype', 'reference_name', 'comment_type', 'content'],
           auto: true,
+
+          delete: {
+            onSuccess(data) {
+                console.log("Like created successfully:", data)
+                fetchPosts();
+              },
+            onError(error) {
+              console.error("Error creating post:", error)
+            }
+          }
     })
 
     if (object.deleteType === 'Post') {
@@ -87,6 +108,8 @@
     if (object.deleteType === 'Post'){
       openOverlay.value = false
     }
+
+    fetchPosts();
   }
 
   const updateLike = (object) => {
@@ -109,6 +132,17 @@
           insert: {
             onSuccess(data) {
                 console.log("Like created successfully:", data)
+                fetchPosts();
+              },
+            onError(error) {
+              console.error("Error creating post:", error)
+            }
+          },
+
+          delete: {
+            onSuccess(data) {
+                console.log("Like created successfully:", data)
+                fetchPosts();
               },
             onError(error) {
               console.error("Error creating post:", error)
@@ -129,11 +163,32 @@
       }
   }
 
-  let posts = createResource({
-    url: 'http://127.0.0.1:8000/api/method/finsta.finsta.doctype.post.post.get_posts_with_likes_and_comments',
-    method: 'GET',
-  })
-  posts.fetch()
+  // let posts = createResource({
+  //   url: 'http://127.0.0.1:8000/api/method/finsta.finsta.doctype.post.post.get_posts_with_likes_and_comments',
+  //   method: 'GET',
+  // })
+  // posts.fetch()
+  let posts = ref([]);  // Reactive posts array
+  const fetchPosts = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/method/finsta.finsta.doctype.post.post.get_posts_with_likes_and_comments');
+      const data = await response.json();
+
+      // Assuming `data.message` contains the array of posts
+      if (data && data.message) {
+        posts.value = data.message;  // Update posts with the data from the API
+      } else {
+        console.error("Invalid data structure:", data);
+      }
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
+  };
+
+  onMounted(() => {
+    fetchPosts();  // Initial fetch of posts when component is mounted
+  });
+
 
   let allUsers = createListResource({
     doctype: 'User',
@@ -147,7 +202,6 @@
 
 <template>
   <MainLayout>
-    <button @click="session.logout.submit()">Logout</button>
     <div class="mx-auto lg:pl-0 md:pl-[80px] pl-0">
       <Carousel
         v-model="currentSlide"
@@ -173,7 +227,7 @@
       </template>
       </Carousel>
 
-      <div id="Posts" class="px-4 max-w-[600px] mx-auto mt-10" v-for="post in posts.data" :key="post">
+      <div id="Posts" class="px-4 max-w-[600px] mx-auto mt-10" v-for="post in posts" :key="post.id">
         <div class="flex items-center justify-between py-2">
           <div class="flex items-center">
             <Link href="/" class="flex items-center">

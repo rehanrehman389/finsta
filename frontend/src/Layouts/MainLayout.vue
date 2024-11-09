@@ -27,7 +27,7 @@
             <Link href="/" class="px-4">
                 <ChevronLeft :size="30" class="cursor-pointer"/>
             </Link>
-            <div class="font-extrabold text-lg">Name Here</div>
+            <div class="font-extrabold text-lg">{{ session.user }}</div>
             <AccountPlusOutline :size="30" class="cursor-pointer px-4"/>
         </div>
 
@@ -46,12 +46,12 @@
                 <MenuItem iconString="Messages" class="mb-4"/>
                 <MenuItem iconString="Notifications" class="mb-4"/>
                 <MenuItem @click="$event => showCreatePost = true" iconString="Create" class="mb-4"/>
-                <Link href="/">
+                <Link href="/user" @click.prevent="goToUserPage">
                     <MenuItem iconString="Profile" class="mb-4"/>
                 </Link>
             </div>
 
-            <Link href="/" class="absolute bottom-0 px-3 w-full">
+            <Link :href="'/account/login'" class="absolute bottom-0 px-3 w-full" @click="session.logout.submit()">
                 <MenuItem iconString="Log out" class="mb-4"/>
             </Link>
         </div>
@@ -68,10 +68,10 @@
             <div v-if="$route.path === '/'" id="SuggestionsSection" class="lg:w-4/12 lg:block hidden text-black mt-10">
                 <Link href="/" class="flex items-center justify-between max-w-[300px]">
                     <div class="flex items-center">
-                        <img class="rounded-full z-10 w-[58px] h-[58px]" src="https://picsum.photos/id/8/300/320" >
+                        <img class="rounded-full z-10 w-[58px] h-[58px]" :src="session.userImage" >
                         <div class="pl-4">
-                            <div class="text-black font-extrabold">NAME Here</div>
-                            <div class="text-gray-500 font-extrabold text-sm">NAME Here</div>                             
+                            <div class="text-black font-extrabold">{{ session.user }}</div>
+                            <div class="text-gray-500 font-extrabold text-sm">{{ session.user }}</div>                             
                         </div>
                     </div>
                     <button class="text-blue-500 hover:text=gray-900 text-xs font-extrabold">
@@ -84,18 +84,20 @@
                         See All
                     </button>
                 </div>
-                <Link href="/" class="flex items-center justify-between max-w-[300px] pb-2">
-                    <div class="flex items-center">
-                        <img class="rounded-full z-10 w-[37px] h-[37px]" src="https://picsum.photos/id/200/300/320" >
-                        <div class="pl-4">
-                            <div class="text-black font-extrabold">NAME Here</div>
-                            <div class="text-gray-500 font-extrabold text-sm">NAME Here</div>                             
+                <div v-for="ruser in randomUsers.data" :key="ruser">
+                    <Link href="/" class="flex items-center justify-between max-w-[300px] pb-2">
+                        <div class="flex items-center">
+                            <img class="rounded-full z-10 w-[37px] h-[37px]" :src="ruser.user_image" >
+                            <div class="pl-4">
+                                <div class="text-black font-extrabold">{{ ruser.username }}</div>
+                                <div class="text-gray-500 font-extrabold text-sm">Suggested for you</div>                             
+                            </div>
                         </div>
-                    </div>
-                    <button class="text-blue-500 hover:text=gray-900 text-xs font-extrabold">
-                        Follow
-                    </button>
-                </Link>
+                        <button class="text-blue-500 hover:text=gray-900 text-xs font-extrabold">
+                            Follow
+                        </button>
+                    </Link>
+                </div>
                 <div class="max-w-[300px] mt-5">
                     <div class="text-sm text-gray-400">About Help Press API Jobs Privacy Terms Locations Meta Verified</div>
                     <div class="text-left text-gray-400 mt-4">© 2024 INSTAGRAM FROM META</div>
@@ -114,7 +116,7 @@
             <Link href="/">
                 <img
                     class="rounded-full w-[30px] cursor-pointer"
-                    src="https://picsum.photos/id/200/300/320"
+                    :src="session.userImage"
                 >
             </Link>
         </div>
@@ -126,6 +128,7 @@
 <script setup>
 import { ref } from 'vue'
 import { Link } from '@inertiajs/vue3'
+import { useRouter } from 'vue-router';
 
 import Magnify from 'vue-material-design-icons/Magnify.vue';
 import HeartOutline from 'vue-material-design-icons/HeartOutline.vue';
@@ -138,5 +141,20 @@ import AccountOutline from 'vue-material-design-icons/AccountOutline.vue';
 import MenuItem from '../Components/MenuItem.vue';
 import CreatePostOverlay from '../Components/CreatePostOverlay.vue';
 
+import { session } from '../data/session'
+const router = useRouter();
+  import { createResource } from 'frappe-ui'
+
 let showCreatePost = ref(false);
+
+function goToUserPage() {
+  router.push('/user'); // Programmatic navigation to the /user page
+}
+
+let randomUsers = createResource({
+    url: 'http://127.0.0.1:8000/api/method/finsta.finsta.doctype.post.post.get_random_user',
+    method: 'GET',
+  })
+randomUsers.fetch()
+
 </script>

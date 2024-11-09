@@ -14,8 +14,10 @@ class Post(Document):
 
 
 @frappe.whitelist(allow_guest=True)
-def get_posts_with_likes_and_comments():
-    posts = frappe.get_all('Post', 
+def get_posts_with_likes_and_comments(user=None):
+    filters = {'owner': user} if user else {}
+    posts = frappe.get_all('Post',
+        filters=filters,
         fields=['name as id', 'text', 'file', 'owner','creation as created_at'],
         order_by='creation desc')
 

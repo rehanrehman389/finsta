@@ -45,6 +45,10 @@ def get_posts_with_likes_and_comments(user=None):
 
 @frappe.whitelist(allow_guest=True)
 def get_random_user():
-    users = frappe.get_all('User', fields=['name as id', 'username', 'user_image'])
+    users = frappe.get_all(
+        'User',
+        filters=[['name', 'not in', ['Guest', 'Administrator']]],
+        fields=['name as id', 'username', 'full_name', 'user_image']
+    )
     random.shuffle(users)
     return users[:5]

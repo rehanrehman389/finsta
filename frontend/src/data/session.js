@@ -6,11 +6,13 @@ import { userResource } from './user'
 
 export function sessionUser() {
   const cookies = new URLSearchParams(document.cookie.split('; ').join('&'))
+  console.log(cookies)
   let _sessionUser = cookies.get('user_id')
   if (_sessionUser === 'Guest') {
     _sessionUser = null
   }
-  return _sessionUser
+  const _userImage = cookies.get('user_image') || null;
+  return { userId: _sessionUser, userImage: _userImage }
 }
 
 export const session = reactive({
@@ -24,7 +26,9 @@ export const session = reactive({
     },
     onSuccess(data) {
       userResource.reload()
-      session.user = sessionUser()
+      const { userId, userImage } = sessionUser() // Get both userId and userImage
+      session.user = userId
+      session.userImage = userImage // Assign userImage to the session
       session.login.reset()
       router.replace(data.default_route || '/')
     },
@@ -33,10 +37,13 @@ export const session = reactive({
     url: 'logout',
     onSuccess() {
       userResource.reset()
-      session.user = sessionUser()
+      const { userId, userImage } = sessionUser() // Get both userId and userImage
+      session.user = userId
+      session.userImage = userImage // Reset userImage as well
       router.replace({ name: 'Login' })
     },
   }),
-  user: sessionUser(),
+  user: sessionUser().userId,
+  userImage: sessionUser().userImage, // Store the user image in the session
   isLoggedIn: computed(() => !!session.user),
 })

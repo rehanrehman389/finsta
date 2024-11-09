@@ -7,7 +7,11 @@
   import { Carousel, Slide, Navigation } from 'vue3-carousel'
 
   import DotsHorizontal from 'vue-material-design-icons/DotsHorizontal.vue';
-  import LikesSection from '@/Components/LikesSection.vue';
+  import LikesSection from '../Components/LikesSection.vue';
+  import ShowPostOverlay from '../Components/ShowPostOverlay.vue';
+
+  import { createResource, createListResource } from 'frappe-ui'
+  import { session } from '../data/session'
 
   let width = ref(window.innerWidth)
   let currentSlide = ref(0)
@@ -15,17 +19,135 @@
   let openOverlay = ref(false)
 
   const props = defineProps({ posts: Object, allUsers: Object})
-  const { posts, allUsers } = toRefs(props)
+  // const { posts, allUsers } = toRefs(props)
 
   onMounted(() => {
     window.addEventListener('resize', () => {
       width.value = window.innerWidth
     })
   })
+
+  const addComment = (object) => {
+    let comment_doc = createListResource({
+      doctype: 'Comment',
+      fields: ['reference_doctype', 'reference_name', 'comment_type', 'content'],
+      auto: true,
+      
+      insert: {
+        onSuccess(data) {
+            console.log("Post created successfully:", data)
+          },
+        onError(error) {
+          console.error("Error creating post:", error)
+        }
+      }
+    })
+
+    // const updatedPost = (object) => {
+    //   for (let i = 0; i < posts.data.length; i++) {
+    //     const post = posts.data[i];
+    //     if (post.id == object.post.id) {
+    //       currentPost.value = post
+    //     }
+    //   }
+    // }
+
+    // Inserting a new post with the uploaded file's URL
+    comment_doc.insert.submit({
+      comment_type: 'Comment',
+      reference_doctype: 'Post',
+      reference_name: object.post.id,
+      content: object.comment
+    })
+  }
+
+  const deleteFunc = (object) => {
+
+    let delete_post_doc = createListResource({
+          doctype: 'Post',
+          fields: ['file', 'text'],
+          auto: true,
+    })
+
+
+    let delete_comment_doc = createListResource({
+          doctype: 'Comment',
+          fields: ['reference_doctype', 'reference_name', 'comment_type', 'content'],
+          auto: true,
+    })
+
+    if (object.deleteType === 'Post') {
+      delete_post_doc.delete.submit(object.id)
+      console.log('post deleted successfully')
+    } else {
+      delete_comment_doc.delete.submit(object.id)
+      console.log('comment deleted successfully')
+    }
+
+    if (object.deleteType === 'Post'){
+      openOverlay.value = false
+    }
+  }
+
+  const updateLike = (object) => {
+      let deleteLike = false
+      let id = null
+
+      for (let i = 0; i < object.post.likes.length; i++) {
+        const like = object.post.likes[i]
+        if (like.owner == object.session.user && like.reference_name === object.post.id) {
+          deleteLike = true
+          id = like.id        
+        }
+      }
+
+      let like_doc = createListResource({
+          doctype: 'Comment',
+          fields: ['reference_doctype', 'reference_name', 'comment_type', 'content'],
+          auto: true,
+          
+          insert: {
+            onSuccess(data) {
+                console.log("Like created successfully:", data)
+              },
+            onError(error) {
+              console.error("Error creating post:", error)
+            }
+          }
+      })
+
+      if (deleteLike) {
+        like_doc.delete.submit(id)
+      } else {
+        // Inserting a new like
+        like_doc.insert.submit({
+          comment_type: 'Like',
+          reference_doctype: 'Post',
+          reference_name: object.post.id,
+          content: 'Liked'
+        })
+      }
+  }
+
+  let posts = createResource({
+    url: 'http://127.0.0.1:8000/api/method/finsta.finsta.doctype.post.post.get_posts_with_likes_and_comments',
+    method: 'GET',
+  })
+  posts.fetch()
+
+  let allUsers = createListResource({
+    doctype: 'User',
+    fields: ['name', 'username', 'user_image'],
+    filters: [
+      ['name', 'not in', ['Guest', 'Administrator']]
+    ]
+  })
+  allUsers.fetch()
 </script> 
 
 <template>
   <MainLayout>
+    <button @click="session.logout.submit()">Logout</button>
     <div class="mx-auto lg:pl-0 md:pl-[80px] pl-0">
       <Carousel
         v-model="currentSlide"
@@ -36,13 +158,13 @@
         :transition="500"
         snapAlign="start"
       >
-      <slide v-for="slide in 10" :key="slide">
+      <slide v-for="slide in allUsers.data" :key="slide">
         <Link href="/" class="relative mx-auto text-center mt-4 px-2 cursor-pointer">
           <div class="absolute z-[-1] -top-[5px] left-[4px] rounded-full rotate-45 w-[64px] h-[64px] contrast-[1.3] bg-gradient-to-t from-yellow-300 to-purple-500 via-red-500">
             <div class="rounded-full ml-[3px] mt-[3px] w-[58px] h-[58px] bg-white" />
           </div>
-          <img src="https://picsum.photos/id/54/300/320" class="rounded-full w-[56px] -mt-[1px]">
-          <div class="text-xs mt-2 w-[60px] truncate text-ellipsis overflow-hidden">Name Here</div>
+          <img :src="slide.user_image" class="rounded-full w-[56px] -mt-[1px]">
+          <div class="text-xs mt-2 w-[60px] truncate text-ellipsis overflow-hidden">{{ slide.username }}</div>
         </Link>
       </slide>
 
@@ -51,16 +173,16 @@
       </template>
       </Carousel>
 
-      <div id="Posts" class="px-4 max-w-[600px] mx-auto mt-10">
+      <div id="Posts" class="px-4 max-w-[600px] mx-auto mt-10" v-for="post in posts.data" :key="post">
         <div class="flex items-center justify-between py-2">
           <div class="flex items-center">
             <Link href="/" class="flex items-center">
-              <img src="https://picsum.photos/id/54/300/320" class="rounded-full w-[38px] h-[38px]">
-              <div class="ml-4 font-extrabold text-[15px]">Name Here</div>
+              <img :src="post.user.user_image" class="rounded-full w-[38px] h-[38px]">
+              <div class="ml-4 font-extrabold text-[15px]">{{ post.user.username }}</div>
             </Link>
             <div class="flex items-center text-[15px] text-gray-500">
               <span class="-mt-5 ml-2 mr-[5px] text-[35px]">.</span>
-              <div>Date Here</div>
+              <div>{{ post.created_at }}</div>
             </div>
           </div>
 
@@ -68,17 +190,23 @@
         </div>
 
         <div class="bg-black rounded-lg w-full min-h-[400px] flex items-center">
-          <img src="https://picsum.photos/id/54/300/320" class="max-auto w-full">
+          <img :src="post.file" class="max-auto w-full">
         </div>
 
-        <LikesSection />
-        <div class="text-black font-extrabold py-1">3 likes</div>
+        <LikesSection
+          :post="post"
+          @like="$event => updateLike($event)"
+        />
+        <div class="text-black font-extrabold py-1">{{ post.likes.length }} likes</div>
         <div>
-          <span class="text-black font-extrabold">Name Here</span>
-            this is some text here
+          <span class="text-black font-extrabold">{{ post.user.username }}</span>
+            {{ post.text }}
         </div>
-        <button class="text-gray-500 font-extrabold py-1">
-          View all 4 comments
+        <button
+          @click="currentPost = post; openOverlay = true"
+          class="text-gray-500 font-extrabold py-1"
+        >
+          View all {{ post.comments.length }} comments
         </button>
       </div>
 
@@ -86,6 +214,15 @@
     </div>
 
   </MainLayout>
+
+  <ShowPostOverlay
+    v-if="openOverlay"
+    :post="currentPost"
+    @addComment="addComment($event)"
+    @updateLike="updateLike($event)"
+    @deleteSelected="deleteFunc($event)"
+    @closeOverlay="$event => openOverlay = false"
+  />
 </template>
 
 <style>

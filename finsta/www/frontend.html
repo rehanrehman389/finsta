@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/assets/finsta/frontend/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Frappe UI App</title>
+    <script type="module" crossorigin src="/assets/finsta/frontend/assets/index.a22779ab.js"></script>
+    <link rel="stylesheet" href="/assets/finsta/frontend/assets/index.f436a010.css">
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="modals"></div>
+    <div id="popovers"></div>
+
+    <script>
+      window.csrf_token = '{{ frappe.session.csrf_token }}'
+    </script>
+    
+  </body>
+</html>

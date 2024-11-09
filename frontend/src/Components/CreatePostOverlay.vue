@@ -2,6 +2,8 @@
     import { ref, reactive } from 'vue'
     import { router, usePage } from '@inertiajs/vue3'
 
+    import { createListResource, createResource } from 'frappe-ui'
+
     import Close from 'vue-material-design-icons/Close.vue';
     import ArrowLeft from 'vue-material-design-icons/ArrowLeft.vue';
     import MapMarkerOutline from 'vue-material-design-icons/MapMarkerOutline.vue';
@@ -25,28 +27,63 @@
         file: null,
     });
 
-    const createPostFunc = () => {
+    const createPostFunc = async () => {
         error.value.text = null
         error.value.file = null
 
-        router.post('/posts', form, {
-            forceFormData: true,
-            preserveScroll: true,
-            onError: errors => {
-                errors && errors.text ? error.value.text = errors.text : ''
-                errors && errors.file ? error.value.file = errors.file: ''
-            },
-            onSuccess: () => {
-                closeOverlay()
+        const formData = new FormData()
+        formData.append("file", form.file) // Append the file
+        formData.append("file_name", form.file.name) // Append the file name
+        formData.append("file_url", `/files/${form.file.name}`) // Set file URL (update based on your logic)
+
+        try {
+            const response = await fetch('http://127.0.0.1:8000/api/method/upload_file', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token 73b6530029d4dea:eee2a9432d87585`,
+                },
+                body: formData,
+            })
+
+            const uploadResponse = await response.json()
+
+            if (response.ok) {
+                console.log('File uploaded successfully', uploadResponse)
+            } else {
+                console.error('Error uploading file', uploadResponse)
             }
-        })
+
+            let post_doc = createListResource({
+                doctype: 'Post',
+                fields: ['file', 'user', 'text'],
+                auto: true,
+
+                insert: {
+                    onSuccess(data) {
+                        closeOverlay()
+                        console.log("Post created successfully:", data)
+                    },
+                    onError(error) {
+                        console.error("Error creating post:", error)
+                    }
+                }
+            })
+
+            // Inserting a new post with the uploaded file's URL
+            post_doc.insert.submit({
+                text: form.text,
+                file: uploadResponse.message.file_url // Assuming uploadResponse contains the file URL
+            })
+
+        } catch (error) {
+            console.error('Error during API call', error)
+        }
     }
 
     const getUploadedImage = (e) => {
         form.file = e.target.files[0]
         let extension = form.file.name.substring(form.file.name.lastIndexOf('.') + 1);
 
-        console.log(extension);
         if (extension == 'jpg' || extension == 'png' || extension == 'jpeg') {
             isValidFile.value = true;
         } else {
@@ -78,7 +115,7 @@
             <div class="flex items-center justify-between w-full rounded-t-xl p-3 border-b-gray-300">
                 <ArrowLeft :size="30" fillColor="#000000" @click="closeOverlay()"/>
                 <div class="text-lg font-extrabold">New reel </div>
-                <button class="text-lg text-blue-500 hover:text-gray-900 font-extrabold">
+                <button @click="createPostFunc" class="text-lg text-blue-500 hover:text-gray-900 font-extrabold">
                     Share
                 </button>
             </div>
@@ -119,7 +156,7 @@
                     <div v-if="error && error.text" class="text-red-500 p-2 font-extrabold">{{error.text}}</div>
 
                     <div class="flex w-full max-h-[200px] bg-white border-b">
-                        <Textarea
+                        <textarea
                             ref="textarea"
                             v-model="form.text"
                             placeholder="Write caption.."
@@ -135,7 +172,7 @@
                                 text-gray-500
                                 text-[18px]
                             "
-                        ></Textarea>
+                        ></textarea>
                     </div>
 
                     <div class="flex items-center justify-between border-b p-3">

@@ -5,18 +5,11 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "user",
+  "text",
   "column_break_tmln",
-  "file",
-  "text"
+  "file"
  ],
  "fields": [
-  {
-   "fieldname": "user",
-   "fieldtype": "Link",
-   "label": "User",
-   "options": "User"
-  },
   {
    "fieldname": "column_break_tmln",
    "fieldtype": "Column Break"
@@ -34,7 +27,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-11-04 22:56:26.275914",
+ "modified": "2024-11-07 22:10:53.485025",
  "modified_by": "Administrator",
  "module": "Finsta",
  "name": "Post",

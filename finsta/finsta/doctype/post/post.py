@@ -6,6 +6,8 @@ from frappe.model.document import Document
 from frappe.utils import pretty_date
 from frappe.utils import strip_html
 
+import random
+
 
 class Post(Document):
 	pass
@@ -38,3 +40,9 @@ def get_posts_with_likes_and_comments():
         post['user'] = frappe.get_value('User', post['owner'], ['name as id', 'username', 'user_image'], as_dict=True)
 
     return posts
+
+@frappe.whitelist(allow_guest=True)
+def get_random_user():
+    users = frappe.get_all('User', fields=['name as id', 'username', 'user_image'])
+    random.shuffle(users)
+    return users[:5]

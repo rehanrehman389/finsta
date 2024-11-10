@@ -1,13 +1,20 @@
 <script setup>
 
 import { toRefs } from 'vue';
-import { usePage } from '@inertiajs/vue3';
-    import { session } from '../data/session'
+import { session } from '../data/session'
+
+import Magnify from 'vue-material-design-icons/Magnify.vue';
+import HeartOutline from 'vue-material-design-icons/HeartOutline.vue';
+import HomeOutline from 'vue-material-design-icons/HomeOutline.vue';
+import Compass from 'vue-material-design-icons/Compass.vue';
+import SendOutline from 'vue-material-design-icons/SendOutline.vue';
+import Plus from 'vue-material-design-icons/Plus.vue';
+import AccountOutline from 'vue-material-design-icons/AccountOutline.vue';
+import Menu from 'vue-material-design-icons/Menu.vue';
 
 const props = defineProps({ iconString: String })
 const { iconString } = toRefs(props)
 
-// const user = usePage().props.auth.user
 
 let icon = null
 
@@ -20,25 +27,16 @@ if (iconString.value === "Create") icon = Plus
 if (iconString.value === "Profile") icon = AccountOutline
 if (iconString.value === "Log out") icon = Menu
 
-import Magnify from 'vue-material-design-icons/Magnify.vue';
-import HeartOutline from 'vue-material-design-icons/HeartOutline.vue';
-import HomeOutline from 'vue-material-design-icons/HomeOutline.vue';
-import Compass from 'vue-material-design-icons/Compass.vue';
-import SendOutline from 'vue-material-design-icons/SendOutline.vue';
-import Plus from 'vue-material-design-icons/Plus.vue';
-import AccountOutline from 'vue-material-design-icons/AccountOutline.vue';
-import Menu from 'vue-material-design-icons/Menu.vue';
-
 </script>
 
 
 <template>
-    <!-- <input
+    <input
         type="checkbox"
         :value="value"
         v-model="proxyChecked"
         class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
-    > -->
+    >
 
     <div class="w-full xl:inline-block xl:hover:bg-gray-100 p-2 rounded-full transition duration-300 ease-in-out cursor-pointer">
         <div class="flex items-center">

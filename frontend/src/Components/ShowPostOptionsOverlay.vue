@@ -19,7 +19,7 @@ const { deleteType, id } = toRefs(props)
             >
                 Delete {{ deleteType }}
             </button>
-            <div class="p-3 text-lg cursor-pointer" @click="$event => $emit('close')">Cancel</div>
+            <div class="p-3 text-lg cursor-pointer" @click="$emit('close')">Cancel</div>
         </div>
     </div>
 </template>

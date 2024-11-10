@@ -11,16 +11,15 @@
   import PlayBoxOutline from 'vue-material-design-icons/PlayBoxOutline.vue'
   import BookmarkOutline from 'vue-material-design-icons/BookmarkOutline.vue';
   import AccountBoxOutline from 'vue-material-design-icons/AccountBoxOutline.vue';
-
-    import { createResource, createListResource } from 'frappe-ui'
-
-    import { session } from '../data/session'
-    let data = reactive({ post: null})
-    const form = reactive({ file: null})
+  
+  import { createResource, createListResource } from 'frappe-ui'
+  import { session } from '../data/session'
 
     const props = defineProps({ postsByUser: Object, user: Object})
     const { postsByUser, user } = toRefs(props)
-
+    
+    let data = reactive({ post: null})
+    const form = reactive({ file: null})
 
     const getUploadedImage = async (e) => {
         form.file = e.target.files[0];

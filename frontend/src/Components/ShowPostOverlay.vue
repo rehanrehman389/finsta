@@ -2,13 +2,12 @@
 import { ref, toRefs } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 
-import ShowPostOptionsOverlay from '@/Components/ShowPostOptionsOverlay.vue'
-import LikesSection from '@/Components/LikesSection.vue'
-
 import Close from 'vue-material-design-icons/Close.vue';
 import DotsHorizontal from 'vue-material-design-icons/DotsHorizontal.vue';
 import EmoticonHappyOutline from 'vue-material-design-icons/EmoticonHappyOutline.vue';
 
+import ShowPostOptionsOverlay from '@/Components/ShowPostOptionsOverlay.vue'
+import LikesSection from '@/Components/LikesSection.vue'
 import { session } from '../data/session'
 
 let comment = ref('')
@@ -164,5 +163,6 @@ const textareaInput = (e) => {
             deleteType = null;
             id = null;
         "
+        @close="deleteType = null; id = null"
     />
 </template>

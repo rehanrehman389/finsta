@@ -1,38 +1,28 @@
 <script setup>
   import { ref, onMounted, toRefs } from 'vue'
   import { Head, Link, router } from '@inertiajs/vue3'
-  import MainLayout from '@/Layouts/MainLayout.vue';
 
   import 'vue3-carousel/dist/carousel.css'
   import { Carousel, Slide, Navigation } from 'vue3-carousel'
-
   import DotsHorizontal from 'vue-material-design-icons/DotsHorizontal.vue';
+
+  import MainLayout from '@/Layouts/MainLayout.vue';
   import LikesSection from '../Components/LikesSection.vue';
   import ShowPostOverlay from '../Components/ShowPostOverlay.vue';
-
-  import { createResource, createListResource } from 'frappe-ui'
+  import { createListResource } from 'frappe-ui'
   import { session } from '../data/session'
 
   let width = ref(window.innerWidth)
   let currentSlide = ref(0)
   let currentPost = ref(null)
   let openOverlay = ref(false)
-
-  const props = defineProps({ posts: Object, allUsers: Object})
-  // const { posts, allUsers } = toRefs(props)
-
-  onMounted(() => {
-    window.addEventListener('resize', () => {
-      width.value = window.innerWidth
-    })
-  })
+  let posts = ref([])
 
   const addComment = (object) => {
     let comment_doc = createListResource({
       doctype: 'Comment',
       fields: ['reference_doctype', 'reference_name', 'comment_type', 'content'],
       auto: true,
-      
       insert: {
         onSuccess(data) {
             console.log("Post created successfully:", data)
@@ -44,16 +34,6 @@
       }
     })
 
-    // const updatedPost = (object) => {
-    //   for (let i = 0; i < posts.data.length; i++) {
-    //     const post = posts.data[i];
-    //     if (post.id == object.post.id) {
-    //       currentPost.value = post
-    //     }
-    //   }
-    // }
-
-    // Inserting a new post with the uploaded file's URL
     comment_doc.insert.submit({
       comment_type: 'Comment',
       reference_doctype: 'Post',
@@ -63,38 +43,35 @@
   }
 
   const deleteFunc = (object) => {
-
     let delete_post_doc = createListResource({
-          doctype: 'Post',
-          fields: ['file', 'text'],
-          auto: true,
-
-          delete: {
-            onSuccess(data) {
-                console.log("Like created successfully:", data)
-                fetchPosts();
-              },
-            onError(error) {
-              console.error("Error creating post:", error)
-            }
-          }
+      doctype: 'Post',
+      fields: ['file', 'text'],
+      auto: true,
+      delete: {
+        onSuccess(data) {
+          console.log("Post created successfully:", data)
+          fetchPosts();
+        },
+        onError(error) {
+          console.error("Error creating post:", error)
+        }
+        }
     })
 
 
     let delete_comment_doc = createListResource({
-          doctype: 'Comment',
-          fields: ['reference_doctype', 'reference_name', 'comment_type', 'content'],
-          auto: true,
-
-          delete: {
-            onSuccess(data) {
-                console.log("Like created successfully:", data)
-                fetchPosts();
-              },
-            onError(error) {
-              console.error("Error creating post:", error)
-            }
-          }
+      doctype: 'Comment',
+      fields: ['reference_doctype', 'reference_name', 'comment_type', 'content'],
+      auto: true,
+      delete: {
+        onSuccess(data) {
+          console.log("Comment created successfully:", data)
+          fetchPosts();
+        },
+        onError(error) {
+          console.error("Error creating comment:", error)
+        }
+     }
     })
 
     if (object.deleteType === 'Post') {
@@ -108,11 +85,9 @@
     if (object.deleteType === 'Post'){
       openOverlay.value = false
     }
-
-    fetchPosts();
   }
 
-  const updateLike = (object) => {
+    const updateLike = (object) => {
       let deleteLike = false
       let id = null
 
@@ -125,35 +100,32 @@
       }
 
       let like_doc = createListResource({
-          doctype: 'Comment',
-          fields: ['reference_doctype', 'reference_name', 'comment_type', 'content'],
-          auto: true,
-          
-          insert: {
-            onSuccess(data) {
-                console.log("Like created successfully:", data)
-                fetchPosts();
-              },
-            onError(error) {
-              console.error("Error creating post:", error)
-            }
-          },
-
-          delete: {
-            onSuccess(data) {
-                console.log("Like created successfully:", data)
-                fetchPosts();
-              },
-            onError(error) {
-              console.error("Error creating post:", error)
-            }
+        doctype: 'Comment',
+        fields: ['reference_doctype', 'reference_name', 'comment_type', 'content'],
+        auto: true,  
+        insert: {
+          onSuccess(data) {
+              console.log("Comment created successfully:", data)
+              fetchPosts();
+            },
+          onError(error) {
+            console.error("Error creating comment:", error)
           }
+        },
+        delete: {
+          onSuccess(data) {
+            console.log("Like created successfully:", data)
+            fetchPosts();
+          },
+          onError(error) {
+            console.error("Error creating post:", error)
+          }
+        }
       })
 
       if (deleteLike) {
         like_doc.delete.submit(id)
       } else {
-        // Inserting a new like
         like_doc.insert.submit({
           comment_type: 'Like',
           reference_doctype: 'Post',
@@ -161,22 +133,19 @@
           content: 'Liked'
         })
       }
-  }
+    }
 
   // let posts = createResource({
   //   url: 'http://127.0.0.1:8000/api/method/finsta.finsta.doctype.post.post.get_posts_with_likes_and_comments',
   //   method: 'GET',
   // })
   // posts.fetch()
-  let posts = ref([]);  // Reactive posts array
   const fetchPosts = async () => {
     try {
       const response = await fetch('http://127.0.0.1:8000/api/method/finsta.finsta.doctype.post.post.get_posts_with_likes_and_comments');
       const data = await response.json();
-
-      // Assuming `data.message` contains the array of posts
       if (data && data.message) {
-        posts.value = data.message;  // Update posts with the data from the API
+        posts.value = data.message;
       } else {
         console.error("Invalid data structure:", data);
       }
@@ -184,11 +153,6 @@
       console.error("Error fetching posts:", error);
     }
   };
-
-  onMounted(() => {
-    fetchPosts();  // Initial fetch of posts when component is mounted
-  });
-
 
   let allUsers = createListResource({
     doctype: 'User',
@@ -198,6 +162,13 @@
     ]
   })
   allUsers.fetch()
+
+  onMounted(() => {
+    window.addEventListener('resize', () => {
+      width.value = window.innerWidth
+    })
+    fetchPosts();
+  });
 </script> 
 
 <template>
@@ -212,19 +183,19 @@
         :transition="500"
         snapAlign="start"
       >
-      <slide v-for="slide in allUsers.data" :key="slide">
-        <Link href="/" class="relative mx-auto text-center mt-4 px-2 cursor-pointer">
-          <div class="absolute z-[-1] -top-[5px] left-[4px] rounded-full rotate-45 w-[64px] h-[64px] contrast-[1.3] bg-gradient-to-t from-yellow-300 to-purple-500 via-red-500">
-            <div class="rounded-full ml-[3px] mt-[3px] w-[58px] h-[58px] bg-white" />
-          </div>
-          <img :src="slide.user_image" class="rounded-full w-[56px] -mt-[1px]">
-          <div class="text-xs mt-2 w-[60px] truncate text-ellipsis overflow-hidden">{{ slide.username }}</div>
-        </Link>
-      </slide>
+        <slide v-for="slide in allUsers.data" :key="slide">
+          <Link href="/" class="relative mx-auto text-center mt-4 px-2 cursor-pointer">
+            <div class="absolute z-[-1] -top-[5px] left-[4px] rounded-full rotate-45 w-[64px] h-[64px] contrast-[1.3] bg-gradient-to-t from-yellow-300 to-purple-500 via-red-500">
+              <div class="rounded-full ml-[3px] mt-[3px] w-[58px] h-[58px] bg-white" />
+            </div>
+            <img :src="slide.user_image" class="rounded-full w-[56px] -mt-[1px]">
+            <div class="text-xs mt-2 w-[60px] truncate text-ellipsis overflow-hidden">{{ slide.username }}</div>
+          </Link>
+        </slide>
 
-      <template #addons>
-        <Navigation />
-      </template>
+        <template #addons>
+          <Navigation />
+        </template>
       </Carousel>
 
       <div id="Posts" class="px-4 max-w-[600px] mx-auto mt-10" v-for="post in posts" :key="post.id">
@@ -266,7 +237,6 @@
 
       <div class="pb-20"></div>
     </div>
-
   </MainLayout>
 
   <ShowPostOverlay

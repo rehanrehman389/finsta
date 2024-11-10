@@ -1,3 +1,36 @@
+<script setup>
+import { ref } from 'vue'
+import { Link } from '@inertiajs/vue3'
+import { useRouter } from 'vue-router';
+import { createResource } from 'frappe-ui'
+
+import Magnify from 'vue-material-design-icons/Magnify.vue';
+import HeartOutline from 'vue-material-design-icons/HeartOutline.vue';
+import HomeOutline from 'vue-material-design-icons/HomeOutline.vue';
+import Compass from 'vue-material-design-icons/Compass.vue';
+import SendOutline from 'vue-material-design-icons/SendOutline.vue';
+import Plus from 'vue-material-design-icons/Plus.vue';
+import AccountOutline from 'vue-material-design-icons/AccountOutline.vue';
+
+import MenuItem from '../Components/MenuItem.vue';
+import CreatePostOverlay from '../Components/CreatePostOverlay.vue';
+import { session } from '../data/session'
+
+let showCreatePost = ref(false);
+const router = useRouter();
+
+function goToUserPage() {
+  router.push('/user');
+}
+
+let randomUsers = createResource({
+    url: 'http://127.0.0.1:8000/api/method/finsta.finsta.doctype.post.post.get_random_user',
+    method: 'GET',
+  })
+randomUsers.fetch()
+
+</script>
+
 <template>
     <div id="MainLayout" class="w-full h-screen">
         <div v-if="$route.path === '/'" id="TopNavHome" class="fixed z-30 md:hidden block w-full bg-white h-[61px] border-b border-b-gray-300">
@@ -61,6 +94,7 @@
                 :class="$route.path === '/' ? 'lg:w-8/12 w-full' : 'max-w-[1200px]'"
             >
                 <main>
+                    <!-- Home.vue -->
                     <slot />
                 </main>
             </div>
@@ -124,37 +158,3 @@
 
     <CreatePostOverlay v-if="showCreatePost" @close="$event => showCreatePost = false"/>
 </template>
-
-<script setup>
-import { ref } from 'vue'
-import { Link } from '@inertiajs/vue3'
-import { useRouter } from 'vue-router';
-
-import Magnify from 'vue-material-design-icons/Magnify.vue';
-import HeartOutline from 'vue-material-design-icons/HeartOutline.vue';
-import HomeOutline from 'vue-material-design-icons/HomeOutline.vue';
-import Compass from 'vue-material-design-icons/Compass.vue';
-import SendOutline from 'vue-material-design-icons/SendOutline.vue';
-import Plus from 'vue-material-design-icons/Plus.vue';
-import AccountOutline from 'vue-material-design-icons/AccountOutline.vue';
-
-import MenuItem from '../Components/MenuItem.vue';
-import CreatePostOverlay from '../Components/CreatePostOverlay.vue';
-
-import { session } from '../data/session'
-const router = useRouter();
-  import { createResource } from 'frappe-ui'
-
-let showCreatePost = ref(false);
-
-function goToUserPage() {
-  router.push('/user'); // Programmatic navigation to the /user page
-}
-
-let randomUsers = createResource({
-    url: 'http://127.0.0.1:8000/api/method/finsta.finsta.doctype.post.post.get_random_user',
-    method: 'GET',
-  })
-randomUsers.fetch()
-
-</script>

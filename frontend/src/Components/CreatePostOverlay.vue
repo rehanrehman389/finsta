@@ -1,15 +1,12 @@
 <script setup>
     import { ref, reactive } from 'vue'
-    import { router, usePage } from '@inertiajs/vue3'
-
-    import { createListResource, createResource } from 'frappe-ui'
+    import { createListResource } from 'frappe-ui'
 
     import Close from 'vue-material-design-icons/Close.vue';
     import ArrowLeft from 'vue-material-design-icons/ArrowLeft.vue';
     import MapMarkerOutline from 'vue-material-design-icons/MapMarkerOutline.vue';
     import ChevronDown from 'vue-material-design-icons/ChevronDown.vue';
 
-    // const user = usePage().props.auth.user
     import { session } from '../data/session'
 
     const emit = defineEmits(['close'])
@@ -33,9 +30,9 @@
         error.value.file = null
 
         const formData = new FormData()
-        formData.append("file", form.file) // Append the file
-        formData.append("file_name", form.file.name) // Append the file name
-        formData.append("file_url", `/files/${form.file.name}`) // Set file URL (update based on your logic)
+        formData.append("file", form.file)
+        formData.append("file_name", form.file.name)
+        formData.append("file_url", `/files/${form.file.name}`)
 
         try {
             const response = await fetch('http://127.0.0.1:8000/api/method/upload_file', {
@@ -70,10 +67,9 @@
                 }
             })
 
-            // Inserting a new post with the uploaded file's URL
             post_doc.insert.submit({
                 text: form.text,
-                file: uploadResponse.message.file_url // Assuming uploadResponse contains the file URL
+                file: uploadResponse.message.file_url
             })
 
         } catch (error) {
@@ -108,14 +104,14 @@
 
 <template>
     <div id="OverlaySection" class="fixed z-50 top-0 left-0 w-full h-screen bg-[#000000] bg-opacity-60 p-3">
-        <button class="absolute right-3 cursor-pointer" @click="$event => closeOverlay()">
+        <button class="absolute right-3 cursor-pointer" @click="closeOverlay()">
             <Close :size="27" fillColor="#FFFFFF"/>
         </button>
 
         <div class="max-w-6xl h-[calc(100%-100px)] mx-auto mt-10 bg-white rounded-xl">
             <div class="flex items-center justify-between w-full rounded-t-xl p-3 border-b-gray-300">
                 <ArrowLeft :size="30" fillColor="#000000" @click="closeOverlay()"/>
-                <div class="text-lg font-extrabold">New reel </div>
+                <div class="text-lg font-extrabold">New Post </div>
                 <button @click="createPostFunc" class="text-lg text-blue-500 hover:text-gray-900 font-extrabold">
                     Share
                 </button>
@@ -192,8 +188,8 @@
                     </div>
 
                     <div class="text-gray-500 mt-3 p-3 text-sm">
-                        Your reel will be shared with your followers in their feeds and can be seen on your profile.
-                        It may also appear in places such as Reels, where anyone can see it.
+                        Your post will be shared with your followers in their feeds and can be seen on your profile.
+                        It may also appear in places such as Posts, where anyone can see it.
                     </div>
                 </div>
             </div>

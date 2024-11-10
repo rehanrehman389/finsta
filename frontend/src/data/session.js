@@ -6,7 +6,6 @@ import { userResource } from './user'
 
 export function sessionUser() {
   const cookies = new URLSearchParams(document.cookie.split('; ').join('&'))
-  console.log(cookies)
   let _sessionUser = cookies.get('user_id')
   if (_sessionUser === 'Guest') {
     _sessionUser = null
